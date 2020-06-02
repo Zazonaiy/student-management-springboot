@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.management.dao.ClassMapper">
+	<select id="queryClass" resultType="map">
+		select t_class.*, u_name from t_class left JOIN t_user ON t_class.manager_user_fk = t_user.u_name
+		<if test="keyword != ''"> where (class_no like '%${keyword}%' or class_name like '%${keyword}%') </if>
+		order by ${orderParam1} ${orderParam2} limit ${offset}, ${pageSize}
+	</select>
+	
+	<select id="getStudentCountByClass" resultType="java.lang.Integer">
+		select count(t_student.id) from t_student left JOIN t_class ON t_class.id = t_student.class_fk
+		where t_student.class_fk=#{class_fk}
+	</select>
+	
+	<select id="findClassByNo" resultType="com.management.model.Clazz">
+		select * from t_class
+		where class_no=#{class_no}
+	</select>
+	
+	<update id="updateClass">
+		update t_class set class_name=#{class_name}, enter_year=#{enter_year}, manager_user_fk=#{manager_user_fk}
+		where class_no=#{class_no}
+	</update>
+	<insert id="addClass">
+		insert into t_class (class_no, class_name, enter_year, manager_user_fk)
+		values (#{class_no}, #{class_name}, #{enter_year}, #{manager_user_fk})
+	</insert>
+	
+	<select id="findTeacherName" resultType="java.lang.String">
+		select u_name from t_user
+		where u_name=#{manager_user_fk}
+	</select>
+	
+	<delete id="deleteClassById">
+		delete from t_class where id=#{id}
+	</delete>
+	
+	<select id="queryClassByUser" resultType="map">
+		select t_class.* from t_class 
+		where manager_user_fk=#{manager_user_fk}
+	</select>
+	
+	<select id="queryNullUserClass" resultType="map">
+		select t_class.* from t_class
+		where manager_user_fk IS NULL
+	</select>
+	
+	<update id="addClassToUser">
+		update t_class set manager_user_fk=#{manager_user_fk}
+		where id=#{id}
+	</update>
+	
+	<update id="removeClassfromUser">
+		update t_class set manager_user_fk=null
+		where id=#{id}
+	</update>
+</mapper>

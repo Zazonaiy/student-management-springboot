@@ -1,0 +1,115 @@
+html,body{
+	height: 100%;
+}
+#base{
+    height:100%;
+    display: flex;
+}
+/* ◊Û±ﬂµº∫Ω¿∏ */
+#left{
+    width:290px;
+    height: 100%;
+    
+}
+#main-div{
+	flex:1;
+    height: 100%;
+}
+h1{
+    text-align: center;
+    margin-top: 20px;
+    font-size: 20px;
+    color: #16b8c7;
+}
+#left .usermsg img{
+    height:124px;
+    width: 124px;
+    border-radius: 50%;
+}
+#left .usermsg{
+    text-align: center;
+    font-size: 20px;
+    color:gray;
+}
+#left .usermsg p{
+    margin-top: 0px;
+}
+#left nav{
+    padding-top: 10px;
+}
+#left nav a{
+    text-decoration: none;
+    color:gray;
+}
+#left nav ul{
+    list-style-type: none;
+}
+#left nav li{
+    height: 46px;
+    line-height: 46px;
+}
+#left nav span{
+    margin: 0px 40px 0px 30px;
+}
+
+/*”“…œ*/
+#main-div{
+	background: #f7f8fa;
+	
+}
+#main-div header{
+	height:50px;
+    line-height: 50px;
+    background:#16b8c7;
+    color:#fff;
+    display: flex;
+    overflow: hidden;
+}
+#main-div header p{
+	margin-left:26px;
+    margin-top: 0px;
+    flex:1;
+}
+#main-div header a{
+	height:20px;
+    width:20px;
+    margin-right: 24px;
+}
+
+/*”“œ¬*/
+#main-div .content{
+	padding: 20px 20px 20px 20px;
+    background: white;
+    margin:24px 24px 24px 24px;
+}
+#main-div h2{
+	color:gray;
+}
+#main-div .tit{
+    padding-right: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+#main-div .tit h2{
+    height:28px;
+    line-height: 28px;
+    margin-top: 0px;
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+#main-div #addAndDel{
+	align: left;
+}
+#main-div #addAndDel batchDelBtn{
+	padding-left: 50px;
+}
+#main-div .table-view{
+	margin-top: 10px;
+    text-align: center;
+}
+#main-div .table-view td{
+	vertical-align: middle;
+}
+#main-div a{
+    margin:0px 5px 0px 5px; 
+}

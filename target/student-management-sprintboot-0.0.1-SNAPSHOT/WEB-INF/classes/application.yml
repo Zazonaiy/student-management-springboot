@@ -1,0 +1,21 @@
+server:
+  port: 9898
+spring:
+  freemarker:
+    suffix: .html
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/student-management?useSSL=false&serverTimezoneCST
+    username: root
+    password: aiywh3
+    filters: stat
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-aliases-package: com.management.model
+  mapper-locations: classpath:mapper/*.xml
+log4j:
+  rootLogger: INFO, stdout
+  logger: com.springboottest.dao

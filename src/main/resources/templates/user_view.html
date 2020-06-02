@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="multipart/form-data; charset=utf-8" />
+	<title>${sysTitle}</title>
+	<script src="${ctxPath}/js/jquery-3.4.1.js"></script>
+	<script src="${ctxPath}/js/vue.min.js"></script>
+	<script src="${ctxPath}/js/bootstrap/bootstrap.js"></script>
+	<link rel="stylesheet" href="${ctxPath}/css/bootstrap/bootstrap.css">
+	<link rel="stylesheet" href="${ctxPath}/font/stufont/iconfont.css">
+	<link rel="stylesheet" href="${ctxPath}/css/student_view.css">
+	<style type="text/css">
+		#classWall{
+			display: flex;
+			flex-direction: row;
+			width: 100%;
+			justify-content: center;
+			background: #CCCCCC;
+			background-color: rgba(0,0,0,0.2);
+		}
+		#classWall .perClass{
+			flex: 1;
+			padding-left: 5px;
+			padding-right: 5px;
+		}
+		.popover{
+			max-width: 500px;
+			height: 200px;
+			border: 1px solid rgba(0,0,0, .2);
+			-webkit-box-shadow: 0 10px 20px rgba(0,0,0, .1);
+				box-shadow: 0 10px 20px rgba(0,0,0, .1);
+		}
+		.popover.top{
+			margin-top: -30px;
+		}
+		.popover a {
+			width: 100%;
+			height: 100%;
+		}
+		.popover img {
+			width: 100%;
+			height: 100%;
+		}
+		.popover-content{
+			width: 150px;
+			height: 150px;
+		}
+	</style>
+</head>
+<body>
+<div id="base">
+<div id="left">
+	<h1>${sysTitle}</h1>
+	<div class="usermsg">
+		<img src="${userphoto}" alt="头像" title="">
+		<p>${username}<p>
+		<p>${userposition}</p>
+		<input hidden="hidden" readonly="readonly" value="${userproperty}" id="userproperty">
+		<input hidden="hidden" readonly="readonly" value="${userposition}" id="userposition">
+		<input hidden="hidden" readonly="readonly" value="${username}" id="username">
+		<input hidden="hidden" readonly="readonly" value="${userphone}" id="userphone">
+		<input hidden="hidden" readonly="readonly" value="${userphoto}" id="userphoto">
+	</div>
+	<nav>
+		<ul>
+			<li><a href="${ctxPath}/management/student/gotoStudent"><span class="iconfont icon-xuesheng"></span>学生管理</a></li>
+			<li><a href="${ctxPath}/management/class/gotoClass"><span class="iconfont icon-paikebiao"></span>班级管理</a></li>
+			<li><a href="${ctxPath}/management/user/gotoUser"><span class="iconfont icon-huihuilicaishi"></span>用户管理</a></li>
+			<li><a href="${ctxPath}/management/property/gotoProperty"><span class="iconfont icon-ic_opt_feature"></span>权限管理</a></li>
+			<li><a><span class="iconfont icon-xiugaishanchuyibiaopankong"></span>修改设置</a></li>
+		</ul>
+	</nav>
+<!-- left -->
+</div>
+
+<div id="main-div" class="center">
+	<div>
+		<header>
+			<p></p>
+			<a href="${ctxPath}/login/toHome"><span class="iconfont icon-guanbi"></span></a>
+		</header>
+		
+		<div class="content">
+		<div class="tit">
+			<h2>用户管理</h2>
+			<button class="btn btn-danger editCompR" data-toggle="modal" data-target="#resetModal">
+				<span class="iconfont icon-dashujukeshihuaico-" aria-hidden="true"></span>重置密码
+			</button>
+		</div>
+		
+		<!-- 重置密码 -->
+		<div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  			<div class="modal-dialog" role="document">
+    			<div class="modal-content">
+      				<div class="modal-header">
+        				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        				<h4 class="modal-title" id="myModalLabel">用户管理</h4>
+      				</div>
+      				<div class="modal-body" >
+      				<form class="form-horizontal">
+      					<!-- 下拉菜单 -->
+        				<div class="row">
+        				<label class="col-sm-2 control-label">用户名</label>
+  							<div class="col-lg-6">
+  							
+    							<div class="input-group">
+      								<div class="input-group-btn" >
+        								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" 
+        									aria-haspopup="true" aria-expanded="false" id="queryUserBtn" @click="queryUserAuto">匹配<span class="caret"></span></button>
+        								<ul class="dropdown-menu">
+          									<li v-for="user in userReset.userArray" v-if="user!=null"><a href="#" @click="matchingInput(user)">{{user}}</a></li>
+          									
+        								</ul>
+      								</div><!-- /btn-group -->
+      								<!-- 输入用户名 -->
+      								<input type="text" class="form-control" v-model="userReset.username">
+    							</div><!-- /input-group -->
+  							</div><!-- /.col-lg-6 -->
+  						</div>
+        				<!-- /下拉菜单 -->
+        				<br>
+        				<div class="form-group">
+    						<label for="inputPassword" class="col-sm-2 control-label">重置密码</label>
+    						<div class="col-lg-6">
+      							<input type="password" class="form-control" id="inputPassword" 
+      								placeholder="Password" width="196" v-model="userReset.password">
+    						</div>
+  						</div>
+  						
+  						<div class="form-group">
+    						<label for="inputPassword" class="col-sm-2 control-label">确认密码</label>
+    						<div class="col-lg-6">
+      							<input type="password" class="form-control" 
+      								placeholder="Password" width="196" v-model="userReset.rePassword">
+    						</div>
+  						</div>
+        			</form>
+        			<div align="right"><button class="btn btn-danger" @click="simpleReset">一键重置</button></div>
+        			<div align="right" style="margin-top: 5px;"><button class="btn btn-warning" @click="simpleRegist">快速注册</button></div>
+        			
+        			
+      				</div>
+      				<div class="modal-footer">
+        				<button type="button" class="btn btn-primary btn-lg btn-block" @click="saveReset">确认保存</button>
+      				</div>
+    			</div>
+  			</div>
+		</div>
+		
+		<!-- 查看已负责班级，可移除 -->
+		<div style="margin-top: 70px;">
+			<div align="center">
+				<div class="btn-group" role="group" aria-label="...">
+  					<button type="button" class="btn btn-default editCompT" data-toggle="modal" data-target="#queryClassModal" @click="queryEClass">查看已负责班级</button>
+  					<button type="button" class="btn btn-default">您可以</button>
+  					<button type="button" class="btn btn-default editCompT" data-toggle="modal" data-target="#addClassModal" @click="queryNullUserClass">添加未负责班级</button>
+				</div>
+			</div>
+			<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="queryClassModal">
+  				<div class="modal-dialog modal-lg" role="document">
+    				<div class="modal-content" id="classWall">
+      					<!-- modal -->
+      					<!--  -->
+      					<div v-for="clazz in classView.classArray">
+    					<div class="perClass">
+    					<div class="thumbnail">
+      						<img src="${userphoto}" alt="...">
+      						<div class="caption" align="center">
+        						<h3>{{clazz.class_name}}</h3>
+        						<p>编号：{{clazz.class_no}} </p>
+        						<p>负责老师：{{clazz.manager_user_fk}}</p>
+        						<p>人数：{{clazz.count}}</p>
+       							<p><button class="btn btn-primary" role="button" @click="removeClassfromUser(clazz.id)">移除</button> 
+       							</p>
+      						</div>
+    					</div>
+    					</div>
+    					</div>
+    					
+    					<!--  -->
+      					<!-- /modal -->
+    				</div>
+  				</div>
+			</div>
+			
+			<!-- 查看未负责班级，可添加 -->
+			<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="addClassModal">
+  				<div class="modal-dialog modal-lg" role="document">
+    				<div class="modal-content" id="classWall">
+      					<!-- modal -->
+      					<!--  -->
+      					<div v-for="clazz in classAdd.unChooseClassArray">
+      					<div v-show="classAdd.isShow">
+    					<div class="perClass">
+    					<div class="thumbnail">
+      						<img src="${userphoto}" alt="...">
+      						<div class="caption" align="center">
+        						<h3>{{clazz.class_name}}</h3>
+        						<p>编号：{{clazz.class_no}} </p>
+        						<p>人数：{{clazz.count}}</p>
+        						<p>状态：未有负责老师</p>
+       							<p><button class="btn btn-primary" role="button" @click="addClassToUser(clazz.id)">添加</button> 
+       							</p>
+      						</div>
+    					</div>
+    					</div>
+    					</div>
+    					</div>
+    					
+    					<!--  -->
+      					<!-- /modal -->
+    				</div>
+  				</div>
+			</div>
+		
+		</div>
+		
+		<!-- 用户基本信息显示 -->
+		<div style="margin-top: 10px;">
+		<div class="panel panel-success">
+			<div class="panel-heading" align="center">
+				<h3>用户基本信息</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table" id="userInfoPane">
+					<thead>
+						<tr>
+							<th>用户名</th>
+							<th>角色</th>
+							<th>手机号码</th>
+							<th>头像</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{{userInfo.username}}</td>
+							<td>{{userInfo.propertyName}}</td>
+							<td><p v-if="userInfo.userPhone!='null'">{{userInfo.userPhone}}</p>
+								<button v-show="userInfo.userPhone=='null'||userInfo.userPhone==''" class="btn btn-warning" 
+									 data-toggle="modal" data-target="#bindPhoneModal">绑定手机</button></td>
+							<td style="width: 200px;">
+
+							<button type="button" class="btn btn-success" title="Popover title"  
+								data-container="body" data-toggle="popover" data-placement="bottom" >
+								显示详情
+							</button>
+							
+							</td>
+						</tr>
+					</tbody>
+				
+				</table>
+			</div>
+			<div class="modal fade" tabindex="-1" role="dialog" id="bindPhoneModal">
+  				<div class="modal-dialog" role="document">
+    				<div class="modal-content">
+     					<div class="modal-header">
+        					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        					<h4 class="modal-title">来绑定手机吧</h4>
+      					</div>
+      					<div class="modal-body">
+        					<form action="">
+        						<div class="form-group">
+        							<label for="exampleInputEmail1">输入手机号</label>
+        							<input type="text" class="form-control" id="inputPhone" placeholder="需要绑定的手机号" v-model="userInfo.bindNewPhoneNum">
+        						</div>
+        					</form>
+      					</div>
+      					<div class="modal-footer">
+        					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        					<button type="button" class="btn btn-primary" @click="bindUserPhone">绑定手机</button>
+      					</div>
+    				</div><!-- /.modal-content -->
+  				</div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+		</div>
+		</div>
+		
+		
+		<!-- content -->
+		</div>
+		
+	</div>
+<!-- main-div -->
+</div>
+
+<!-- base -->
+</div>
+
+
+</body>
+</html>
+
+<script>
+	var vue = new Vue({
+		el : "#main-div",
+		data : {
+			classView : {
+				classArray : null
+			},
+			classAdd : {
+				unChooseClassArray : null,
+				choosedClassNos : [],
+				isShow : true,
+			},
+			userReset : {
+				username : "",
+				password : "",
+				rePassword : "",
+				userArray : [],
+			},property : {
+				isAbledT : true,
+				isAbledT : false,
+			},
+			userInfo : {
+				username : "",
+				propertyName : "",
+				userPhone : "",
+				headImg : "",
+				bindNewPhoneNum : "",
+			}
+		},
+		methods : {
+			matchingInput : function(username){
+				this.userReset.username = username;
+			},
+			bindUserPhone : function(){
+				var username = this.userInfo.username;
+				var phonenum = this.userInfo.bindNewPhoneNum;
+				console.log(this.userInfo.bindNewPhoneNum);
+				if (phonenum == ""){
+					alert("还未输入手机号码");
+					return ;
+				}
+				$.post("${ctxPath}/management/property/bindUserPhone", {phonenum : phonenum, username : username}, response=>{
+					if (response.status == 0){
+						alert("手机绑定成功");
+						location.reload();
+					}else if (response.status == 10){
+						alert("手机号码不能为空");
+					}else{
+						alert("该手机号码已经绑定其他账号了");
+						this.userInfo.bindNewPhoneNum = "";
+					}
+				})
+			},
+			simpleRegist : function(){
+				var uname = this.userReset.username;
+				if (uname == ""){
+					alert("请输入快速创建的用户名");
+					return ;
+				}
+				$.post("${ctxPath}/login/registUserByRoot", {username : uname, password : "doRegistByRoot"}, response=>{
+					if (response.status == 0){
+						alert("快速创建成功!");
+						this.clearReset();
+					}else if(response.status == 8){
+						alert("账号格式错误：字母/字母+数字");
+						this.clearReset();
+					}else {
+						alert("账号已经存在，创建失败");
+						this.clearReset();
+					}
+				})
+			},
+			simpleReset : function(){
+				var uname = this.userReset.username;
+				if (uname == ""){
+					alert("请输入要重置的用户");
+					return;
+				}
+				$.post("${ctxPath}/login/updateUserByRoot", {username : uname}, response=>{
+					if (response.status == 0){
+						alert("用户: " + uname + " 已重置密码为默认值");
+						this.clearReset();
+					}else if (response.status == 1){
+						alert("被重置的用户不存在");
+						this.clearReset();
+					}else{
+						alert("重置失败，error: " + response.status);
+						this.clearReset();
+					}
+				})
+			},
+			clearReset : function(){
+				this.userReset.username = "";
+				this.userReset.password = "";
+				this.userReset.rePassword = "";
+			},
+			saveReset : function(){
+				var uname = this.userReset.username;
+				var upass = this.userReset.password;
+				var rpass = this.userReset.rePassword;
+				console.log(uname);
+				console.log(upass);
+				console.log(rpass);
+				if (rpass != upass){
+					alert("两次输入的新密码不一致");
+					this.userReset.password = "";
+					this.userReset.rePassword = "";
+					return false;
+				}
+				
+				$.post("${ctxPath}/login/updateUserByRoot", {username : uname, password :rpass}, response=>{
+					if (response.status == 0){
+						alert("重置密码成功");
+						this.clearReset();
+					}else if(response.status == 1){
+						alert("被重置用户不存在")
+						this.clearReset();
+					}else{
+						alert("重置失败, error" + response.status)
+						this.clearReset();
+					}
+				})
+			},
+			queryUserAuto : function(){
+				var keyword = this.userReset.username
+				console.log(keyword);
+				$.post("${ctxPath}/management/property/fuzzyQueryUser", {keyword : keyword}, response=>{
+					var userArray = response.userArray;
+					if (userArray.length < 1){
+						this.userReset.username = [];
+					}
+					this.userReset.userArray = userArray;
+					console.log(this.userReset.userArray);
+				})
+				
+			},
+			removeClassfromUser : function(classId) {
+				$.post("${ctxPath}/management/class/removeClassfromUser", {classId : classId}, response=>{
+					this.queryEClass();
+				})
+			},
+			addClassToUser : function(classId){
+				var username = $("#username").val();
+				$.post("${ctxPath}/management/class/addClassToUser", {classId : classId, username : username}, response=>{
+					this.queryNullUserClass();
+				})
+			},
+			queryNullUserClass : function(){
+				$.post("${ctxPath}/management/class/queryNullUserClass", {}, response=>{
+					var classArray = response.classArray;
+					console.log(classArray);
+					if (classArray.length < 1){
+						this.classAdd.isShow = false;
+						classArray = null;
+						alert("所有班级均已有负责老师");
+						
+					}
+					this.classAdd.unChooseClassArray = classArray;
+					
+				})
+			},
+			queryEClass : function(){
+				var username = $("#username").val();
+				$.post("${ctxPath}/management/class/queryClassByUser", {managerUser : username}, response=>{
+					var classArray = response.classArray;
+					this.classView.classArray = classArray;
+					console.log(classArray);
+				})
+			},
+		},
+		mounted : function(){
+			//弹出框
+			$("[data-toggle='popover']").popover({
+				html : true,
+				animation: true,
+				container : "body",
+				content : '<a href="#" class="thumbnail" onclick="changeHeadImg()"><img style="width:100%;" src="${userphoto}"></a>',
+			});
+			
+			//基本信息
+			this.userInfo.username = $("#username").val();
+			this.userInfo.propertyName = $("#userposition").val();
+			this.userInfo.userPhone = $("#userphone").val();
+			console.log("ss "+$("#userphone").val());
+			this.userInfo.headImg = $("#userphoto").val();
+			console.log(this.userInfo.username)
+			console.log(this.userInfo.propertyName)
+			console.log(this.userInfo.userPhone)
+			console.log(this.userInfo.headImg)
+			
+			//权限
+			console.log($("#userproperty").val())
+			if ($("#userproperty").val() < 1){
+				this.property.isAbledT = true;
+				this.property.isAbledR = true;
+			}else if($("#userproperty").val() == 1){
+				$(".editCompR").attr("disabled", "disabled");
+				this.property.isAbledT = true;
+				this.property.isAbledR = false;
+			}else{
+				$(".editCompT").attr("disabled", "disabled");
+				$(".editCompR").attr("disabled", "disabled");
+				this.property.isAbledT = false;
+				this.property.isAbledR = false;
+			}
+		}
+	})
+	
+	function changeHeadImg(){
+		alert("修改头像(TODO)");
+	}
+	
+	function show(){
+		var d = new Date();
+		var year = d.getFullYear();
+		var month = d.getMonth() + 1
+		var week=d.getDay();
+		var dayNum = d.getDate();
+		var h = d.getHours();
+		var m = d.getMinutes();
+		var s=d.getSeconds();
+		$("#main-div header p").text(year+"年"+month+"月"+dayNum+"日" + ": 星期" +week+" "+h+":"+m+":"+s);
+	}
+	$(function(){
+		setInterval(()=>{show()}, 1000);
+	})
+</script>

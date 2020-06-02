@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="multipart/form-data; charset=utf-8" />
+	<title>${sysTitle}</title>
+	<script src="${ctxPath}/js/jquery-3.4.1.js"></script>
+	<script src="${ctxPath}/js/vue.min.js"></script>
+	<script src="${ctxPath}/js/bootstrap/bootstrap.js"></script>
+	<link rel="stylesheet" href="${ctxPath}/css/bootstrap/bootstrap.css">
+	<link rel="stylesheet" href="${ctxPath}/font/stufont/iconfont.css">
+	<link rel="stylesheet" href="${ctxPath}/css/student_view.css">
+</head>
+<body>
+<div id="base">
+<div id="left">
+	<h1>${sysTitle}</h1>
+	<div class="usermsg">
+		<img src="${userphoto}" alt="头像" title="">
+		<p>${username}<p>
+		<p>${userposition}</p>
+		<input hidden="hidden" readonly="readonly" value="${userproperty}" id="userproperty">
+	</div>
+	<nav>
+		<ul>
+			<li><a href="${ctxPath}/management/student/gotoStudent"><span class="iconfont icon-xuesheng"></span>学生管理</a></li>
+			<li><a href="${ctxPath}/management/class/gotoClass"><span class="iconfont icon-paikebiao"></span>班级管理</a></li>
+			<li><a href="${ctxPath}/management/user/gotoUser"><span class="iconfont icon-huihuilicaishi"></span>用户管理</a></li>
+			<li><a href="${ctxPath}/management/property/gotoProperty"><span class="iconfont icon-ic_opt_feature"></span>权限管理</a></li>
+			<li><a><span class="iconfont icon-xiugaishanchuyibiaopankong"></span>修改设置</a></li>
+		</ul>
+	</nav>
+<!-- left -->
+</div>
+<div id="main-div" class="center">
+	<div>
+		<header>
+			<p></p>
+			<a href="${ctxPath}/login/toHome"><span class="iconfont icon-guanbi"></span></a>
+		</header>
+		
+		<div class="content">
+		<div class="tit">
+			<h2>权限管理</h2>
+		</div>
+		<!-- content -->
+		</div>
+		
+	</div>
+<!-- main-div -->
+</div>
+
+<!-- base -->
+</div>
+
+
+</body>
+</html>
+
+<script>
+	var vue = new Vue({
+		el : "#main-div",
+		data : {
+			
+		},
+		method : {
+			
+		},
+		mounted : function(){
+			
+		}
+	})
+	
+	function show(){
+		var d = new Date();
+		var year = d.getFullYear();
+		var month = d.getMonth() + 1
+		var week=d.getDay();
+		var dayNum = d.getDate();
+		var h = d.getHours();
+		var m = d.getMinutes();
+		var s=d.getSeconds();
+		$("#main-div header p").text(year+"年"+month+"月"+dayNum+"日" + ": 星期" +week+" "+h+":"+m+":"+s);
+	}
+	$(function(){
+		setInterval(()=>{show()}, 1000);
+	})
+</script>

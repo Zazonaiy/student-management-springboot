@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>注册</title>
+	<link rel="stylesheet" href="${ctxPath}/css/register.css" />
+	<link rel="stylesheet" href="${ctxPath}/font/iconfont.css" />
+	<script src="${ctxPath}/js/jquery-3.4.1.js"></script>
+	<script src="${ctxPath}/js/vue.min.js"></script>
+</head>
+<body>
+    <div class="container" id="main-div">
+    <form action="register" method="post" onsubmit="return checkForm()">
+        <!--头部图片-->
+        <div class="head">
+            <h1>欢迎你加入我们，请告诉我你的名字</h1>
+        </div>
+        <!--主体注册框-->
+        <div class="register">
+        
+            <div class="register-pane" id="u">
+                <span class="iconfont icon-denglu"></span>
+                <input placeholder="请输入用户名" type="text" name="username" v-model="username">
+                <span class="iconfont icon-cuowu error" v-show="usernameShow"></span>
+            </div>
+            <div class="register-pane" id="p">
+                <span class="iconfont icon-denglumima-"></span>
+                <input placeholder="请输入密码" type="password" name="password" v-model="password">
+                <span class="iconfont icon-cuowu error" v-show="passwordShow"></span>
+            </div>
+            <div class="register-pane" id="rp">
+                <span class="iconfont icon-denglumima-"></span>
+                <input placeholder="再次确认密码" type="password" name="repassword" v-model="rePassword">
+                <span class="iconfont icon-cuowu error" v-show="rePasswordShow"></span>
+            </div>
+            <div class="tiaokuan-pane">
+                <span class="tiaokuan">请仔细阅读注册条款</span>
+                <input type="checkbox" id="isconfirm" value="">
+            </div>
+            
+            <div class="register-btn">
+            <button class="btn" type="button" @click="registe">注册</button>
+        	</div>
+        </div>
+  		
+	</form>
+    </div>
+</body>
+</html>
+
+<script>
+	var vue = new Vue({
+		el : "#main-div",
+		data : {
+			username : "",
+			password : "",
+			rePassword : "",
+			usernameShow : false,
+			passwordShow : false,
+			rePasswordShow : false,
+		},
+		methods : {
+			clearRegister : function(){
+				vue.usernameShow = false;
+				vue.passwordShow = false;
+				vue.rePasswordShow = false;
+			},
+			registe : function(){
+				var isConfirm = $("#isconfirm").is(":checked");
+				console.log(isConfirm);
+				if (vue.username == "" || vue.password == "" || vue.rePassword == ""){
+					alert("账号和密码不能为空哦");
+					vue.usernameShow = true;
+					vue.passwordShow = true;
+					vue.rePasswordShow = true;
+					return ;
+				}
+				if (vue.password != vue.rePassword){
+					vue.clearRegister();
+					vue.passwordShow = true;
+					vue.rePasswordShow = true;
+					alert("输入密码不一致");
+					return ;
+				}
+				if (!isConfirm){
+					alert("请仔细阅读条款并勾选已读");
+					return ;
+				}
+				
+				var username = vue.username;
+				var password = vue.rePassword;
+				$.post("${ctxPath}/login/doRegist", {username : username, password : password}, function(ret){
+					if (ret.status == 0){
+						alert("注册成功！欢迎你" + " ->" + username + "<-, 快去登录吧" + " ^_^");
+						$(location).attr("href", "${ctxPath}/login/loginpage");
+					}else if (ret.status == 8){
+						alert("账号只能是字母 或 字母+数字哦");
+						vue.username = "";
+						vue.password = "";
+						vue.rePassword = "";
+						vue.usernameShow = true;
+					}else{
+						alert("账号已存在，注册失败" + " >_<  errorcode:" + ret.status);
+					}
+				});
+			}
+		}
+	})
+</script>

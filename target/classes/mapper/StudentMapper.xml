@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.management.dao.StudentMapper">
+	<sql id="BASE_TABLE">
+		t_student
+	</sql>
+	<sql id="BASE_COL">
+		t_student.id, s_num, s_name, s_birthday
+	</sql>
+	
+	<select id="findStudentByNum" resultType="com.management.model.Student">
+		select t_student.id, s_num, s_name, s_birthday, s_sex, s_photo from <include refid="BASE_TABLE" />
+		where t_student.s_num=#{s_num}
+	</select>
+	
+	 
+	<select id="queryStudent" resultType="map">
+		select t_student.*, u_name, class_no, class_name, enter_year, manager_user_fk 
+		from t_student left JOIN t_class ON t_student.class_fk = t_class.id left JOIN t_user ON t_class.manager_user_fk = t_user.id 
+		<if test="classId !='' or keyword != ''">
+		 where 
+		</if>
+		<if test="classId != ''"> class_fk=${classId} and </if>
+		<if test="keyword != ''"> (s_num like '%${keyword}%' or s_name like '%${keyword}%') </if>
+		order by ${orderParam1} ${orderParam2} limit ${offset}, ${pageSize}
+	</select>
+	
+	<!--  <insert id="addStudent"  useGeneratedKeys="true" keyProperty="s.id" parameterType="com.management.model.Student">
+		insert into t_student (s_num, s_name, s_birthday, s_sex
+		<if test="s.sPhoto != '' and s.sPhoto != null">
+		, s_photo
+		</if>
+		) values (#{s.sNum}, #{s.sName}, #{s.sBirthday}, #{s.sSex}
+		<if test="s.sPhoto != '' and s.sPhoto != null">
+		 , #{s.sPhoto}
+		</if>
+		)
+	</insert>  -->
+	<insert id="addStudent">
+		insert into t_student (s_num, s_name, s_birthday, s_sex
+		<if test="s_photo != '' and s_photo != null">
+		, s_photo
+		</if>
+		) values (#{s_num}, #{s_name}, #{s_birthday}, #{s_sex}
+		<if test="s_photo != '' and s_photo != null">
+		 , #{s_photo}
+		</if>
+		)
+	</insert>
+	<update id="updateStudent">
+		update t_student set s_name=#{s_name}, s_sex=#{s_sex}
+		<if test="s_photo != '' and s_photo != null">
+		, s_photo=#{s_photo} 
+		</if>
+		where s_num=#{s_num}
+	</update>
+	<delete id="deleteStudent">
+		delete from t_student where s_num=#{s_num}
+	</delete>
+	
+	
+</mapper>

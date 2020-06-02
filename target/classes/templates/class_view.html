@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="multipart/form-data; charset=utf-8" />
+	<title>${sysTitle}</title>
+	<script src="${ctxPath}/js/jquery-3.4.1.js"></script>
+	<script src="${ctxPath}/js/vue.min.js"></script>
+	<script src="${ctxPath}/js/bootstrap/bootstrap.js"></script>
+	<link rel="stylesheet" href="${ctxPath}/css/bootstrap/bootstrap.css">
+	<link rel="stylesheet" href="${ctxPath}/font/stufont/iconfont.css">
+	<link rel="stylesheet" href="${ctxPath}/css/student_view.css">
+	<style type="text/css">
+		.center{
+			text-align: center;
+		}
+		#addAndDel button{
+			margin-top: 10px;
+			height : 40px;
+			weight : 400px;
+		}
+		#addPane{
+			text-align: center;
+		}
+		#addPane input, #updatePane input, #view_stu input{
+			padding: 1px 0px;
+			width: 174px;
+			height: 25px;
+		}
+		.currentOrder{
+			color:red;
+		}
+		.table-bordered th, .table-bordered td{
+			border: 1px solid #000 !important;
+		}
+		.loadfilePane{
+			margin-top: 5px;
+			margin-bottom: 5px;
+		}
+		#addAndDel{
+			margin-top: 30px;
+		}
+		#table-head .selectDiv{
+			width: 100%;
+			margin-top: 40px;
+			margin-bottom: 20px;
+		}
+		#paggingSelect{
+			margin-top: 100px;
+		}
+		#viewTable th{
+			text-align:center;
+		}
+
+	</style>
+</head>
+<body>
+<div id="base">
+<div id="left">
+	<h1>${sysTitle}</h1>
+	<div class="usermsg">
+		<img src="${userphoto}" alt="头像" title="">
+		<p>${username}<p>
+		<p>${userposition}</p>
+		<input hidden="hidden" readonly="readonly" value="${userproperty}" id="userproperty">
+	</div>
+	<nav>
+		<ul>
+			<li><a href="${ctxPath}/management/student/gotoStudent"><span class="iconfont icon-xuesheng"></span>学生管理</a></li>
+			<li><a href="${ctxPath}/management/class/gotoClass"><span class="iconfont icon-paikebiao"></span>班级管理</a></li>
+			<li><a href="${ctxPath}/management/user/gotoUser"><span class="iconfont icon-huihuilicaishi"></span>用户管理</a></li>
+			<li><a href="${ctxPath}/management/property/gotoProperty"><span class="iconfont icon-ic_opt_feature"></span>权限管理</a></li>
+			<li><a><span class="iconfont icon-xiugaishanchuyibiaopankong"></span>修改设置</a></li>
+		</ul>
+	</nav>
+	
+</div>
+
+<div id="main-div">
+	<div>
+	<header>
+		<p></p>
+		<a href="${ctxPath}/login/toHome"><span class="iconfont icon-guanbi"></span></a>
+	</header>
+	</div>
+	
+	<div class="content">
+	<div class="tit">
+		<h2>班级管理</h2>
+		<p>共有数据<span class="total"></span>{{queryPage.allRowCount}}条</p>
+	</div>
+	<div align="left" id="addAndDel">
+		<button data-toggle="modal" data-target=".bs-example-modal-sm" class="btn btn-info editComp" @click="useAdd"><span class="iconfont icon-tianjia"></span>添加班级</button>
+		<button @click="batchDelete" id="batchDelBtn" class="btn btn-danger editComp"><span class="iconfont icon-shanchu"></span>批量删除</button>
+	</div>
+	<div id="table-head" align="center">
+		<div class="selectDiv">
+		<div class="row">
+  			<div class="col-lg-6">
+    			<div class="input-group">
+      				<span class="input-group-btn">
+        				<button class="btn btn-default" type="button" @click="queryClass">Search!</button>
+      				</span>
+      				<input type="text" class="form-control" v-model="keyword" placeholder="输入班级编号/名称来查询班级">
+    			</div><!-- /input-group -->
+  			</div><!-- /.col-lg-6 -->
+  		</div>		
+		</div>
+		
+		<table width="60%" class="table table-hover table-condensed table-bordered table-view" id="viewTable">
+			<thead>
+				<tr>
+					<th id="check_all_td" ><input id="check_all" type='checkbox' v-model="classCheck.isCheckAll" @change="checkAll"/></th>
+					<th>班级编号<a :class="{currentOrder : currentOrder.orderParam1=='class_no'&&currentOrder.orderParam2=='asc'}" href="javascript://" @click="orderClassList('class_no','asc')"> ↑ </a>
+						<a :class="{currentOrder : currentOrder.orderParam1=='class_no'&&currentOrder.orderParam2!='asc'}" href="javascript://" @click="orderClassList('class_no','desc')"> ↓ </a></th>
+					<th>班级名称<a :class="{currentOrder : currentOrder.orderParam1=='class_name'&&currentOrder.orderParam2=='asc'}" href="javascript://" @click="orderClassList('class_name','asc')"> ↑ </a>
+						<a :class="{currentOrder : currentOrder.orderParam1=='class_name'&&currentOrder.orderParam2!='asc'}" href="javascript://" @click="orderClassList('class_name','desc')"> ↓ </a></th>
+					<th>入学年份<a :class="{currentOrder : currentOrder.orderParam1=='enter_year'&&currentOrder.orderParam2=='asc'}" href="javascript://" @click="orderClassList('enter_year','asc')"> ↑ </a>
+						<a :class="{currentOrder : currentOrder.orderParam1=='enter_year'&&currentOrder.orderParam2!='asc'}" href="javascript://" @click="orderClassList('enter_year','desc')" > ↓ </a></th>
+					<th>负责老师<a :class="{currentOrder : currentOrder.orderParam1=='manager_user_fk'&&currentOrder.orderParam2=='asc'}" href="javascript://" @click="orderClassList('manager_user_fk','asc')"> ↑ </a>
+						<a :class="{currentOrder : currentOrder.orderParam1=='manager_user_fk'&&currentOrder.orderParam2!='asc'}" href="javascript://" @click="orderClassList('manager_user_fk','desc')"> ↓ </a></th>
+					<th>学生人数</th>
+					<th>操作</th>				
+				</tr>
+			</thead>
+			<tbody v-for="clazz in classArray" v-for="count in classArray.length">
+				<tr>
+					<td align="center"><input type="checkbox" v-model="classCheck.checkedValues" :value="clazz.id"></td>
+					<td align="center"><a href="javascript://" @click="openViewClass(clazz.class_no)">{{clazz.class_no}}</a></td>
+					<td align="center">{{clazz.class_name}}</td>
+					<td align="center">{{clazz.enter_year}}</td>
+					<td align="center">{{clazz.u_name}}</td>
+					<td align="center">{{clazz.size}}</td>
+					
+					<td align="center"><a href='javascript://' @click='property.isAbled&&deleteClass(clazz.id)'> 删除   </a>|
+					<a @click="property.isAbled&&useUpdate(clazz.class_no)" data-toggle="modal" data-target=".bs-example-modal-sm"> 修改 </a></td>
+					
+				</tr>			
+			</tbody>
+		</table>
+		
+		<div style="text-align: center" id="paggingSelect">
+			<div>
+			<nav aria-label="Page navigation">
+				<ul class="pagination">
+					<li>
+						<a href="javascript://" aria-label="Previous" @click="goToPage('1')" >首页
+						<span aria-hidden="true">&laquo;</span>
+						</a>
+					</li>
+					<li>
+						<a href="javascript://" aria-label="Previous" @click="goToPage(queryPage.currentPage-1)" >
+							<span aria-hidden="true">&laquo;</span>
+						</a>
+					</li>
+					<!-- 前省略号 -->
+    				<li v-for="i in 1" class="toPageBtn" 
+    					v-show="queryPage.pageBeforeOmit">
+    					<a href="#">...</a>
+    				
+    				</li>
+					<li v-for="i in queryPage.pageCount" class="toPageBtn" v-show="queryPage.pageBuffer[i-1]=='0'">
+						<a href="javascript://" @click="goToPage(i)">{{i}}</a>
+					</li>
+					<!-- 前省略号 -->
+    				<li v-for="i in 1" class="toPageBtn" 
+    					v-show="queryPage.pageAfterOmit">
+    					<a href="#">...</a>
+    				
+    				</li>
+					<li>
+						<a href="javascript://" aria-label="Next"  @click="goToPage(queryPage.currentPage+1)">
+						<span aria-hidden="true">&raquo;</span>
+						</a>
+					</li>
+					<li>
+						<a href="javascript://" aria-label="Next"  @click="goToPage(queryPage.pageCount)">
+						<span aria-hidden="true">&raquo;</span>
+						尾页
+						</a>
+					</li>
+				</ul>
+			</nav>
+			</div>每页 
+			<select id="page_size_sel" @change="queryClass" v-model="queryPage.pageSize">
+			<option value="5">5</option>
+			<option value="10">10</option>
+			<option value="15">15</option>
+			<option value="20">20</option>
+			</select> {{queryPage.pageSize}}条，共{{queryPage.pageCount}}页，共{{queryPage.allRowCount}}条数据
+			<div>  当前{{queryPage.currentPage}}  页</div>
+		</div>
+		<!-- /content -->
+	</div>
+	
+	<!-- 模态框 -->
+	<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" id="classModal">
+		<div class="modal-dialog modal-sm" role="document">
+			<div class="modal-content" id="addPane">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="myModalLabel">更新And新增班级</h4>
+					
+				</div>
+				<div class="modal-body">
+					<div>班级编号: <input type="text" name="class_no" required="required" v-model="updateClassModal.classNo" :readonly="updateClassModal.isClassNoReadonly"></div>
+					<div>班级名称: <input type="text" name="class_name" required="required" v-model="updateClassModal.className"></div>
+					<div>入学年份: <input type="month" name="enter_year" required="required" v-model="updateClassModal.enterYear"></div>
+					<div>负责老师: <input type="text" name="manager_user_fk" v-model="updateClassModal.managerUserFk"></div>
+					<!-- 
+					<form class="upload_form" enctype="multipart/form-data" method="post" action="" style="text-align: center">
+						上传头像:
+						<div class="loadfilePane"> 
+							<input type="file" class="stu_photo_file" name="file" accept="image/*"  v-show="false"
+								@change="setLoadImgEventItem" id="stu_photo"/>
+							<button type="button" @click="chooseFile" class="btn btn-success">选择文件</button>
+						</div>
+						<button @click="loadFiles" type="button" class="btn btn-warning">点击上传</button>
+				
+					</form>	
+					 -->				
+				</div>
+				<div class="modal-footer" style="text-align: center">
+					<Button size="large" type="primary" @click="addOrUpdateClass" class="btn btn-primary btn-lg btn-block editComp">保存</Button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+</div>
+
+</body>
+</html>
+
+<script>
+	
+	var vue = new Vue({
+		el : "#main-div",
+		data : {
+			keyword : "",
+			classId : "",
+			classArray : null,
+			property : {
+				isAbled : true,
+			},
+			imgData : {
+				accept: 'image/gif, image/jpeg, image/png, image/jpg',
+				imgUrl : "",
+			},
+			updateClassModal : {
+				classId : "",
+				classNo : "",
+				className : "",
+				enterYear : "",
+				managerUserFk : "",
+				updateOrAdd : "",
+				//headImg : "",
+				//loadImgEventItem : null,
+				isClassNoReadonly : false,
+			},
+			classCheck : {
+				isCheckAll : false,
+				checkedValues : []
+			},
+			currentOrder : {
+				orderParam1 : "class_no",
+				orderParam2 : "asc"
+			},
+			queryPage : {
+				currentPage : 1,
+				pageSize : 5,
+				pageCount : 0,
+				allRowCount : 0,
+				liCount : [],
+				pageBuffer : [],
+				pageBeforeOmit : false,
+				pageAffterOmit : true,
+			}
+		},
+		methods : {
+			goToPage : function(page){
+				if (page < 1){
+					alert("已经是第一页啦");
+					return ;
+				}
+				if (page > this.queryPage.pageCount) {
+					alert("已经到底啦");
+					return ;
+				}
+				this.queryPage.currentPage = page;
+				console.log(this.queryPage.currentPage);
+				this.queryClass();
+			},
+			checkAll : function(){
+				var classArray = this.classArray;
+				if (classArray != null){
+					if (this.classCheck.isCheckAll){
+						this.classCheck.checkedValues = [];
+						for (var i = 0; i <classArray.length; i++){
+							this.classCheck.checkedValues.push(classArray[i].id);		//删除的时候根据id删
+						}
+						console.log(this.classCheck.checkedValues)
+					}else{
+						this.classCheck.checkedValues = [];
+					}
+				}
+			},
+			batchDelete : function(){
+				
+				var classIds = "";
+				var checkedValues = this.classCheck.checkedValues;
+				if (checkedValues.length == 0){
+					alert("还未勾选删除项哦");
+					return false;
+				}
+				if (confirm("确认要删除选中的所有项吗？")){
+					for (var i = 0; i < checkedValues.length; i++){
+						classIds += checkedValues[i] + " ";
+					}
+					console.log(classIds);
+					
+					$.post("${ctxPath}/management/class/deleteClass", {id : classIds}, response=>{
+						if (response.status == 0){
+							alert("删除成功");
+							this.queryClass();
+						}else{
+							alert(result.status);
+						}
+						
+					});
+					return true;
+				}else{
+					return false;
+				}
+				
+			},
+			deleteClass : function(classId){
+				if (confirm("确认要删除选中的记录吗?\n") == true){
+					$.post("${ctxPath}/management/class/deleteClass", {id : classId}, response=>{
+						if (response.status == 0){
+							alert("删除成功")
+						}else{
+							alert(result.status);
+						}
+						this.queryClass();
+					})
+					return true;
+				}else{
+					return false;
+				}
+
+			},
+			doAdd : function(classNo, className, enterYear, managerUserFk){
+				$.post("${ctxPath}/management/class/addClass", {
+					classNo : classNo,
+					className : className,
+					enterYear : enterYear,
+					managerUserFk : managerUserFk
+				}, response =>{
+					if (response.status == 0){
+						alert("新增班级成功！");
+						this.queryClass();
+						$("#classModal").modal('hide');
+					}else if (response.status == 1){
+						alert("该负责老师不存在哦");
+					}else{
+						alert("添加失败，错误: " + response.status); 
+					}
+					this.clearModal();
+					return ;
+				})
+			},
+			doUpdate : function(classNo, className, enterYear, managerUserFk){
+				$.post("${ctxPath}/management/class/updateClass", {
+					classNo : classNo,
+					className : className,
+					enterYear : enterYear,
+					managerUserFk : managerUserFk
+				}, response =>{
+					if (response.status == 0){
+						alert("更新成功");
+						this.queryClass();
+						$("#classModal").modal('hide');
+						this.clearModal();
+					}else if (response.status == 1) {
+						alert("该负责老师不存在哦");
+						this.updateClassModal.managerUserFk = "";
+					}else{
+						alert("更新失败，错误: " + response.status);
+						this.clearModal();
+					}
+					//this.clearModal();
+					return ;
+				})
+				
+			},
+			addOrUpdateClass : function(){
+				var way = vue.updateClassModal.updateOrAdd;
+				var classNo = vue.updateClassModal.classNo;
+				var className = vue.updateClassModal.className;
+				var enterYear = vue.updateClassModal.enterYear;
+				var managerUserFk = vue.updateClassModal.managerUserFk;
+				
+				if (way == ""){
+					alert("error")
+					return ;
+				}
+				if (classNo == "" || className == "" || enterYear == ""){
+					alert("请填写完整的班级信息");
+					return ;
+				}
+				if (way == "add"){
+					vue.doAdd(classNo, className, enterYear, managerUserFk);
+				}else if (way == "update"){
+					vue.doUpdate(classNo, className, enterYear, managerUserFk);
+				}else{
+					alert("error2");
+					return ;
+				}
+				
+			},
+			clearModal : function(){
+				this.updateClassModal.classId = "";
+				this.updateClassModal.classNo = "";
+				this.updateClassModal.className = "";
+				this.updateClassModal.enterYear = "";
+				this.updateClassModal.managerUserFk = "";
+				this.updateClassModal.isClassNoReadonly = false;
+			},
+			useUpdate : function(classNo){
+				this.clearModal();
+				this.updateClassModal.updateOrAdd = "update";
+				this.updateClassModal.classNo = classNo;
+				this.updateClassModal.isClassNoReadonly = true;
+			},
+			useAdd : function(){
+				this.clearModal();
+				this.updateClassModal.updateOrAdd = "add";
+			},
+			updatePageNav : function(){
+				vue.queryPage.pageBuffer = [];
+				for (var i = 1; i <= this.queryPage.pageCount; i++){
+					if ((this.queryPage.currentPage-3<i&&i<3+this.queryPage.currentPage)){
+						vue.queryPage.pageBuffer.push("0");
+					}else{
+						vue.queryPage.pageBuffer.push("1");
+					}
+					
+					//console.log("page: " + i)
+					//console.log("当前页：" + this.queryPage.currentPage)
+					//console.log("下线："+(this.queryPage.currentPage-3));
+					//console.log("上线："+(3+this.queryPage.currentPage))
+					//console.log(vue.queryPage.pageBuffer);
+					console.log(this.queryPage.pageCount-i);
+				}
+				if (this.queryPage.currentPage - 1 > 2){
+					this.queryPage.pageBeforeOmit = true;
+				}else{
+					this.queryPage.pageBeforeOmit = false;
+				}
+				if (this.queryPage.currentPage < this.queryPage.pageCount - 2){
+					this.queryPage.pageAfterOmit = true;
+					console.log("!!");
+					console.log(this.queryPage.pageAfterOmit);
+				}else{
+					this.queryPage.pageAfterOmit = false;
+					console.log("--");
+					console.log(this.queryPage.pageAfterOmit);
+				}
+				console.log("倒数第三页"+(this.queryPage.pageCount - 2));
+				console.log("当前页"+this.queryPage.currentPage)
+			},
+			queryClass : function(){
+				console.log(this.currentOrder.orderParam1);
+				console.log(this.currentOrder.orderParam2);
+				this.classCheck.isCheckAll = false;
+				this.classCheck.checkedValues = [];
+				this.classArray = null;
+				$.post("${ctxPath}/management/class/queryClass", {keyword : this.keyword,
+					orderParam1 : this.currentOrder.orderParam1,
+					orderParam2 : this.currentOrder.orderParam2,
+					paggingParam1 : this.queryPage.currentPage,
+					paggingParam2 : this.queryPage.pageSize} ,response =>{
+						var result = (JSON.parse(response))
+						this.classArray = result.classArray; 
+						console.log( vue.classArray );
+						this.queryPage.pageCount = result.pageCount;
+						this.queryPage.allRowCount = result.allRowCount;
+						this.updatePageNav();
+					});
+				
+			},
+			orderClassList : function(orderParam1, orderParam2){
+				this.currentOrder.orderParam1 = orderParam1;
+				this.currentOrder.orderParam2 = orderParam2;
+				this.queryClass();
+			}
+		},
+		mounted : function(){
+			this.queryClass();
+			if ($("#userproperty").val() > 1){
+				$(".editComp").attr("disabled", "disabled");
+				this.property.isAbled=false;
+				console.log(this.property.isAbled);
+			}
+		}
+		
+	})
+	
+	
+	function show(){
+		var d = new Date();
+		var year = d.getFullYear();
+		var month = d.getMonth() + 1
+		var week=d.getDay();
+		var dayNum = d.getDate();
+		var h = d.getHours();
+		var m = d.getMinutes();
+		var s=d.getSeconds();
+		$("#main-div header p").text(year+"年"+month+"月"+dayNum+"日" + ": 星期" +week+" "+h+":"+m+":"+s);
+	}
+	$(function(){
+		setInterval(()=>{show()}, 1000);
+	})
+	
+</script>

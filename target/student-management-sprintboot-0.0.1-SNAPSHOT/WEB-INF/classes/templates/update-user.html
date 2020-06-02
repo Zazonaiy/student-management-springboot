@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>修改密码</title>
+	<link rel="stylesheet" href="${ctxPath}/css/register.css" />
+	<link rel="stylesheet" href="${ctxPath}/font/iconfont.css" />
+	<script src="${ctxPath}/js/jquery-3.4.1.js"></script>
+	<script src="${ctxPath}/js/vue.min.js"></script>
+</head>
+<body>
+	<div class="container" id="main-div">
+	<form>
+        <!--头部图片-->
+        <div class="head">
+            <h1>没问题，请告诉我你的新密码</h1>
+        </div>
+        <!--主体注册框-->
+        <div class="register">
+            <div class="register-pane">
+                <span class="iconfont icon-denglu"></span>
+                <input placeholder="请输入用户名" type="text" name="username" v-model="username">
+                <span class="iconfont icon-cuowu error" v-show="usernameShow"></span>
+            </div>
+            <div class="register-pane">
+                <span class="iconfont icon-denglumima-"></span>
+                <input placeholder="请输入旧密码" type="password" name="oldpassword" v-model="oldPassword">
+                <span class="iconfont icon-cuowu error" v-show="oldPasswordShow"></span>
+            </div>
+            <div class="register-pane">
+                <span class="iconfont icon-denglumima-"></span>
+                <input placeholder="请输入新密码" type="password" name="password" v-model="password">
+                <span class="iconfont icon-cuowu error" v-show="passwordShow"></span>
+            </div>
+            <div class="register-pane">
+                <span class="iconfont icon-denglumima-"></span>
+                <input placeholder="确认新密码" type="password" name="repassword" v-model="rePassword">
+                <span class="iconfont icon-cuowu error" v-show="rePasswordShow"></span>
+            </div>
+            
+            <div class="register-btn">
+            	<button class="btn" type="button" @click="update">走你</button>
+        	</div>
+        </div>
+        
+	</form>
+    </div>	
+
+</body>
+</html>
+
+<script>
+	var vue = new Vue({
+		el : "#main-div",
+		data : {
+			username : "",
+			oldPassword : "",
+			password : "",
+			rePassword : "",
+			usernameShow : false,
+			oldPasswordShow : false,
+			passwordShow : false,
+			rePasswordShow : false,
+		},
+		methods : {
+			updateClear : function(){
+				usernameShow = false;
+				oldPasswordShow = false;
+				passwordShow = false;
+				rePasswordShow = false;				
+			},
+			update : function(){
+				vue.updateClear();
+				if (vue.username == "" || vue.oldPassword == "" || vue.password == "" || vue.rePassword == ""){
+					alert("账号和密码不能为空哦");
+					vue.usernameShow = true;
+					vue.oldPasswordShow = true;
+					vue.passwordShow = true;
+					vue.rePasswordShow = true;
+					return false;
+				}
+				
+				var uname = vue.username;
+				var opass = vue.oldPassword;
+				var upass = vue.password;
+				var rpass = vue.rePassword;	
+				if (opass == upass){
+					alert("新密码不能跟旧密码一样哦");
+					vue.oldPasswordShow = true;
+					vue.passwordShow = true;
+					vue.oldPassword = "";
+					vue.password = "";
+					return false;
+				}
+				if (rpass != upass){
+					alert("两次输入的新密码不一致");
+					vue.passwordShow = true;
+					vue.rePasswordShow = true;
+					vue.password = "";
+					vue.rePassword = "";
+					return false;
+				}
+				
+				$.post("${ctxPath}/login/doUpdate", {username : uname, oldPassword : opass, newPassword : rpass},
+						function(ret){
+					if (ret.status == 0){
+						alert("密码修改成功！" + " ->" + uname + "<-, 快去登录吧" + " ^_^");
+						$(location).attr("href", "/login/loginpage");
+					}else if (ret.status == 1){
+						vue.usernameShow = true;
+						alert("用户名不存在哦  w(o_ow)");
+						vue.oldPassword = "";
+						vue.password = "";
+						vue.rePassword = "";
+					}else if(ret.status == 2){
+						vue.oldPasswordShow = true;
+						alert("旧密码验证错误  w(o_ow)");
+						vue.oldPassword = "";
+						vue.password = "";
+						vue.rePassword = "";
+					}else {
+						vue.usernameShow = true;
+						vue.oldPasswordShow = true;
+						vue.passwordShow = true;
+						vue.rePasswordShow = true;
+						alert("未知错误 _(???)_  " + ret.status);
+						vue.oldPassword = "";
+						vue.password = "";
+						vue.rePassword = "";
+					}
+				})
+			}
+		}
+	})
+</script>
+

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.management.dao.UserMapper">
+	<sql id="BASE_TABLE">
+		t_user
+	</sql>
+	<sql id="BASE_COL">
+		id, u_name, u_pass, u_phone_num
+	</sql>
+	
+	<select id="queryUserByName" resultType="com.management.model.User">
+		select * from t_user
+		where u_name=#{u_name}
+	</select>
+	<select id="queryUserByPhonenum" resultType="com.management.model.User">
+		select * from t_user
+		where u_phone_num=#{u_phone_num}
+	</select>
+	
+	<select id="queryUsernameCountByName" resultType="java.lang.Integer">
+		select count(*) from t_user
+		where u_name=#{u_name}
+	</select>
+	<select id="queryUsernameCountByPhonenum" resultType="java.lang.Integer">
+		select count(*) from t_user
+		where u_phone_num=#{u_phone_num}
+	</select>
+	
+	<insert id="addUser">
+		insert into t_user (u_name, u_pass) 
+		values (#{u_name}, #{u_pass})
+	</insert>
+	<update id="updateUser">
+		update t_user set u_pass=#{u_pass} 
+		where u_name=#{u_name}
+	</update>
+	
+</mapper>

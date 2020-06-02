@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>登录</title>
+	<script src="${ctxPath}/js/jquery-3.4.1.js"></script>
+	<script src="${ctxPath}/js/vue.min.js"></script>
+	<link rel="stylesheet" href="${ctxPath}/css/login.css" />
+	<link rel="stylesheet" href="${ctxPath}/font/iconfont.css" />
+	<link rel="shortcut icon" href="#" />
+	
+    <style type="text/css">
+    	#ver-code{
+    		display:flex;
+    		flex-direction: row;
+    		background: rgba(0,0,0,0.2);
+    		height: 70px;
+    		width: 459px;
+    		border-radius: 10px;
+    		justify-items: space-between;
+    		margin: 20px;
+    		padding-top: 11px;
+    		padding-left: 20px;
+    		margin-left: 40px;
+    		
+    	}
+    	#ver-code input{
+    		background: rgba(0,0,0,0.2);
+    		height: 58px;
+    		width: 160px;
+    		padding-left: 20px;
+    		color:#999;
+    		font-size:18px;
+    		border:0;
+    		
+    		margin-left:20px;
+    	}
+    	#ver-code img{
+    		height: 58px;
+    		width: 165px;
+    		right: 20px;
+    		border:0;
+    		margin-left :50px;
+    	}
+    	.login{
+    		padding-top: 40px;
+    	}
+    </style>	
+</head>
+<body>
+	<div class="container" id="main-div">
+        <!-- 头部 -->
+        <div class="head">
+            <image src="/img/1.jpg" id="headimg"></image>
+            <p>法号壹猛男</p>
+            <p>四川省乐山市</p>
+        </div>
+
+        <form action="validate" method="post" onsubmit="return checkForm()">
+            <div class="login">
+                <!--用户名-->
+                <div class="login-pane">
+                    <span class="iconfont icon-denglu"></span>
+                    <input v-model="login.username" placeholder="请输入用户名/手机号" type="text" name="username">
+                    <span class="iconfont icon-cuowu error" v-show="login.usernameShow"></span>
+                </div>
+                <!--密码-->
+                <div class="login-pane">
+                    <span class="iconfont icon-denglumima-"></span>
+                    <input v-model="login.password" placeholder="请输入密码" type="password" name="password">
+                    <span class="iconfont icon-cuowu error" v-show="login.passwordShow"></span>
+                </div>
+            	<!-- 验证码  -->
+            	<div v-show="vercode.vercodeShow" id="verPane">
+            	<div id="ver-code">
+                	<input v-model="vercode.inputVerCode" placeholder="请输入验证码" type="text" name="password" id="vercode-input">
+                	<img src="" id="vercode-img" @click="getVercode">
+                	<input v-model="vercode.isVerPass" hidden="hidden" >
+            	</div>	
+            	</div>
+            </div>
+
+         </form>   
+		
+			
+            <!--登录按钮-->
+            <button class="login-btn" type="button" @click="validate">登录</button>
+            <a href="${ctxPath}/login/toUpdateUser" style="color:skyblue;">修改密码</a>
+        
+            <!--注册按钮-->
+            <button class="login-btn reg-btn" type="button" @click="register">注册</button>
+
+    </div>
+</body>
+</html>
+
+<script>
+	var vue = new Vue({
+		el : "#main-div",
+		data : {
+			login : {
+				username : "",
+				password : "",
+				usernameShow : false,
+				passwordShow : false,
+			},
+			vercode : {
+				inputVerCode : "",
+				vercodeShow : false,
+				failLoginCount : 0,
+				isVerPass : "",
+				test : "",
+			}
+		},
+		methods : {
+			doVerification(){
+				var inputCode = vue.vercode.inputVerCode;
+				$.ajax({
+					url : "${ctxPath}/login/doVerification",
+					async : false,
+					type : "post",
+					data : {
+						"inputCode" : inputCode
+					},
+					success : function(ret){
+						console.log("status: " + ret.status);
+						if (ret.status == 0) {
+							vue.vercode.isVerPass = "0";
+							vue.vercode.test = "success";
+							console.log("yes " + vue.vercode.isVerPass);
+							
+						}else{
+							vue.vercode.isVerPass = "";
+							console.log("no");
+						}
+						
+						console.log("isPass" + vue.vercode.isVerPass);
+						console.log("yes " + vue.vercode.isVerPass);
+						console.log("yes " + vue.vercode.test);
+					},
+					error : function(err){
+						alert(err);
+					}
+				});
+				/*	//要用同步ajax，$.post默认是异步
+				$.post("${ctxPath}/login/doVerification", {"inputCode" : inputCode}, function(ret){
+					console.log("status: " + ret.status);
+					if (ret.status == 0) {
+						vue.vercode.isVerPass = "0";
+						vue.vercode.test = "success";
+						console.log("yes " + vue.vercode.isVerPass);
+						
+					}else{
+						vue.vercode.isVerPass = "";
+						console.log("no");
+					}
+					
+					console.log("isPass" + vue.vercode.isVerPass);
+					console.log("yes " + vue.vercode.isVerPass);
+					console.log("yes " + vue.vercode.test);
+				});
+				*/
+			},
+			getVercode : function(){
+				var time = new Date().getTime();
+				$.post("${ctxPath}/login/getVercode", {}, function(ret){
+					$("#ver-code img").attr("src", "${ctxPath}/login/getVercode");
+				})
+			},
+			clearLogin : function(){
+				vue.login.usernameShow = false;
+				vue.login.passwordShow = false;
+			},
+			validate : function(){
+				vue.clearLogin();
+				var username = vue.login.username;
+				var password = vue.login.password;
+				var isVercodeShow = vue.vercode.vercodeShow;
+				
+				if (vue.login.username == "" || vue.login.password == ""){
+					if (username == ""){
+						vue.login.usernameShow = true;
+					}
+					if (password == ""){
+						vue.login.passwordShow = true;
+					}
+					vue.vercode.failLoginCount++;
+					alert("用户名或密码不能为空！");
+					if (vue.vercode.failLoginCount >= 3){
+						vue.getVercode();
+						vue.vercode.vercodeShow = true;
+					}					
+					return ;
+				}
+				//验证码
+				if (vue.vercode.vercodeShow == true){
+					vue.doVerification();	//TODO
+					if (vue.vercode.isVerPass != "0"){
+						console.log(vue.vercode.isVerPass);
+						alert("验证码错误");
+						vue.vercode.isVerPass = "";
+						return ;
+					}else{
+						vue.vercode.isVerPass = "";
+					}
+					
+				}
+				
+				console.log(vue.login.username);
+				console.log(vue.login.password);
+				$.post("${ctxPath}/login/doLogin", {username : vue.login.username, password : vue.login.password}, 
+						function(ret){
+					if (ret.status == 0){
+						//登录成功
+						failLoginCount = 0;
+						$(location).attr("href", "${ctxPath}/login/toHome");
+						return ;
+					}else{
+						if (ret.status == 100){
+							alert("登陆失败: 系统错误 " + ret.status);
+						}else if (ret.status == 2){
+							vue.login.passwordShow = true;
+							alert("密码错误");
+							vue.vercode.failLoginCount++;
+							vue.login.password = "";
+						}else if (ret.status == 1){
+							vue.login.usernameShow = true;
+							alert("用户名不存在");
+							vue.vercode.failLoginCount++;
+							vue.login.username = "";
+							vue.login.password = "";
+						}
+					}
+					console.log(vue.vercode.failLoginCount);
+					if (vue.vercode.failLoginCount >= 3){
+						vue.getVercode();
+						vue.vercode.vercodeShow = true;
+					}
+				})
+			},
+			register : function(){
+				$(location).attr("href", "${ctxPath}/login/toRegister");
+			}
+		},
+		mounted : function(){
+			
+		}
+		
+	})
+</script>

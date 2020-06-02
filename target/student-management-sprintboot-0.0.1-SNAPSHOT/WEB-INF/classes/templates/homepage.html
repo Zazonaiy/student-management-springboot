@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>主页</title>
+	<link rel="stylesheet" href="${ctxPath}/css/HomePage.css" />
+	<script src="${ctxPath}/js/jquery-3.4.1.js"></script>
+	<script src="${ctxPath}/js/vue.min.js"></script>
+	<style type="text/css">
+		#bind-phonenum{
+			color: white;
+		}
+		#bind-phonenum h3{
+			font-size: 32px;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>这里是主页</h1>
+		<h2>欢迎回来， ${username}</h2>
+		<div id="bind-phonenum" hidden="hidden"><h3>你可以    <a>绑定手机号</a></h3></div>
+	
+		<a href="${ctxPath}/login/cancellation">注销</a>
+		<a href="${ctxPath}/student/gotoStudent">管理学生信息</a>
+		<div>这里是整合版的主页</div>
+	</div>
+	
+</body>
+</html>
+
+<script>
+	
+</script>
